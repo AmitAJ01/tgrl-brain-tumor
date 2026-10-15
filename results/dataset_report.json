@@ -1,0 +1,130 @@
+{
+  "dataset_name": "Figshare Contrast-Enhanced MRI (CE-MRI) Brain Tumor Dataset",
+  "doi": "10.6084/m9.figshare.1512427",
+  "total_slices": 3064,
+  "total_patients": 233,
+  "class_breakdown": {
+    "Meningioma": {
+      "slices": 708,
+      "patients": 82,
+      "percent_slices": 23.11
+    },
+    "Glioma": {
+      "slices": 1426,
+      "patients": 89,
+      "percent_slices": 46.54
+    },
+    "Pituitary": {
+      "slices": 930,
+      "patients": 62,
+      "percent_slices": 30.35
+    }
+  },
+  "image_properties": {
+    "shapes": {
+      "(512, 512)": 3049,
+      "(256, 256)": 15
+    },
+    "dtypes": {
+      "int16": 3064
+    },
+    "mask_shapes": {
+      "(512, 512)": 3049,
+      "(256, 256)": 15
+    },
+    "mask_dtypes": {
+      "uint8": 3064
+    }
+  },
+  "integrity_checks": {
+    "unreadable_files": [],
+    "corrupt_or_nan_images": [],
+    "invalid_mask_values": [],
+    "empty_masks_count": 0,
+    "exact_duplicate_image_groups": 0
+  },
+  "patient_level_separation": {
+    "official_folds_available": true,
+    "leaking_patients_across_folds": 0,
+    "train_val_patient_overlap": 0,
+    "train_test_patient_overlap": 0,
+    "val_test_patient_overlap": 0,
+    "patient_leakage_status": "ZERO_LEAKAGE (Strictly patient-independent)"
+  },
+  "splits_summary": {
+    "train": {
+      "slices": 1793,
+      "patients": 139,
+      "classes": {
+        "Meningioma": 418,
+        "Pituitary": 561,
+        "Glioma": 814
+      }
+    },
+    "val": {
+      "slices": 628,
+      "patients": 47,
+      "classes": {
+        "Meningioma": 124,
+        "Glioma": 325,
+        "Pituitary": 179
+      }
+    },
+    "test": {
+      "slices": 643,
+      "patients": 47,
+      "classes": {
+        "Meningioma": 166,
+        "Pituitary": 190,
+        "Glioma": 287
+      }
+    }
+  },
+  "fold_summary": {
+    "1": {
+      "slices": 542,
+      "patients": 45,
+      "classes": {
+        "Meningioma": 112,
+        "Glioma": 245,
+        "Pituitary": 185
+      }
+    },
+    "2": {
+      "slices": 679,
+      "patients": 46,
+      "classes": {
+        "Meningioma": 167,
+        "Glioma": 338,
+        "Pituitary": 174
+      }
+    },
+    "3": {
+      "slices": 572,
+      "patients": 48,
+      "classes": {
+        "Meningioma": 139,
+        "Pituitary": 202,
+        "Glioma": 231
+      }
+    },
+    "4": {
+      "slices": 628,
+      "patients": 47,
+      "classes": {
+        "Meningioma": 124,
+        "Glioma": 325,
+        "Pituitary": 179
+      }
+    },
+    "5": {
+      "slices": 643,
+      "patients": 47,
+      "classes": {
+        "Meningioma": 166,
+        "Pituitary": 190,
+        "Glioma": 287
+      }
+    }
+  }
+}

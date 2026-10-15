@@ -1,0 +1,32 @@
+dataset:
+  raw_dir: "C:/Users/amitr/Desktop/brain-tumor-ai-proj/data/raw"
+  cache_dir: "data/cache"
+  manifest_path: "results/split_manifest.json"
+  image_size: 224
+  num_classes: 3
+  class_names: ["Meningioma", "Glioma", "Pituitary"]
+
+training:
+  seed: 42
+  batch_size: 32
+  num_workers: 0  # 0 is most reliable on Windows CPU
+  epochs: 10
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  early_stopping_patience: 3
+
+models:
+  classifier_backbone: "resnet18"  # Pretrained ResNet18
+  segmentation_backbone: "unet_resnet18"  # ResNet18 U-Net
+  tgrl_backbone: "tgrl_resnet18"  # Joint shared encoder with U-Net decoder and classification head
+
+tgrl:
+  lambda_seg: 1.0
+  lambda_cons: 0.5
+  lambda_cf: 0.1
+  cf_margin: 0.2
+
+calibration:
+  num_bins: 15
+  threshold_range: [0.33, 0.99]
+  num_thresholds: 50

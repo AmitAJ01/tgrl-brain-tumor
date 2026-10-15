@@ -1,0 +1,7 @@
+Config,Components,Test_Acc,Macro_F1,Test_Dice,ROI_Agreement,Mean_CF_Delta,ECE
+A1: Baseline Classification,L_cls,0.9160186625194401,0.9046900726276023,N/A,N/A,N/A,0.043136559415197284
+A2: + Tumor Segmentation,L_cls + L_seg,0.9160186625194401,0.9046900726276023,0.6897,N/A,N/A,0.043136559415197284
+A3: + Tumor-Focused Representation,Eval on X_ROI,0.5894245723172629,0.5758454106280193,0.6897,0.5941,N/A,N/A
+A4: + Tumor-Grounded Consistency,L_cls + L_seg + L_cons,0.838258164852255,0.7867420629067537,0.6695,0.3997,N/A,N/A
+A5: + Counterfactual Tumor Removal,L_cls + L_seg + L_cons + L_cf,0.838258164852255,0.7867420629067537,0.6695,0.3997,0.3035,N/A
+A6: + Confidence Calibration & Selective,All + T* + tau*,0.9160186625194401,0.7867420629067537,0.6695,0.3997,0.3035,0.03787748995316717

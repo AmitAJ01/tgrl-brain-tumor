@@ -1,0 +1,23 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyTorch checkpoints and large binaries (> 100MB GitHub limit)
+checkpoints/
+*.pth
+*.pt
+*.npz
+
+# Cached dataset arrays and raw data
+data/cache/
+data/raw/
+*.mat
+
+# Temporary files and system folders
+tmp/
+temp/
+.DS_Store
+Thumbs.db
+*.log
+.system_generated/
