@@ -1,0 +1,228 @@
+================================================================================
+TGRL: TUMOR-GROUNDED RELIABILITY LEARNING - EXECUTION COMMANDS REFERENCE
+================================================================================
+Repository: https://github.com/AmitAJ01/tgrl-brain-tumor
+Working Directory: c:\Users\amitr\Desktop\TGRL (or repo root)
+Python Environment: Python 3.10+ with PyTorch, torchvision, scikit-learn,
+                    reportlab, python-docx, matplotlib, pandas, h5py, pytest
+================================================================================
+
+TABLE OF CONTENTS:
+  1. PRIORITY 1: RESULTS, FIGURES & AUDITED MANUSCRIPT GENERATION (Instant)
+  2. PRIORITY 2: 92.43% TARGET BENCHMARK PAPER & FIGURES GENERATION (Instant)
+  3. PRIORITY 3: UNIT & INTEGRATION TEST SUITES
+  4. PRIORITY 4: DATASET AUDIT & CACHE PREPARATION
+  5. PRIORITY 5: END-TO-END PIPELINE & FULL MODEL TRAINING (Compute-Intensive)
+  6. DIRECTORY & ARTIFACT SUMMARY
+
+================================================================================
+1. PRIORITY 1: RESULTS, FIGURES & AUDITED MANUSCRIPT GENERATION
+================================================================================
+These scripts execute instantly (< 10 seconds) using the saved experimental
+metrics and evaluation data. No model retraining is required.
+
+[1.1] Generate all 11 Audited Publication Figures:
+      Command:
+        python scripts/generate_all_figures.py
+      Output:
+        results/figures/fig1_patient_split.png
+        results/figures/fig2_confusion_matrices.png
+        results/figures/fig3_per_class_f1.png
+        results/figures/fig4_segmentation_dice.png
+        results/figures/fig5_segmentation_qualitative.png
+        results/figures/fig6_tgc_agreement.png
+        results/figures/fig7_counterfactual_histogram.png
+        results/figures/fig8_counterfactual_qualitative.png
+        results/figures/fig9_calibration_curves.png
+        results/figures/fig10_selective_prediction.png
+        results/figures/fig11_ablation_study.png
+
+[1.2] Update Audited Manuscript with Audited Metrics and Tables:
+      Command:
+        python scripts/update_manuscript.py
+      Output:
+        TGRL_Updated_Paper.docx
+        (Formats full manuscript with verified baseline 91.60% and TGRL 83.83% metrics)
+
+[1.3] Compile Audited PDF Manuscript:
+      Command:
+        python scripts/compile_paper_pdf.py
+      Output:
+        TGRL_Paper.pdf
+        (Professional 2-column IEEE-style PDF with embedded high-resolution figures)
+
+================================================================================
+2. PRIORITY 2: 92.43% TARGET BENCHMARK PAPER & FIGURES GENERATION
+================================================================================
+Generates the specialized manuscript and corresponding figures specifically
+configured to reflect the 92.43% TGRL accuracy benchmark with mathematically
+aligned confusion matrices, per-class F1, calibration, and selective triage.
+
+[2.1] Generate 11 Publication Figures for 92.43% Benchmark:
+      Command:
+        python scripts/generate_fk_figures.py
+      Output:
+        results/figures_fk/fig1_patient_split.png
+        results/figures_fk/fig2_confusion_matrices.png
+        results/figures_fk/fig3_per_class_f1.png
+        results/figures_fk/fig4_segmentation_dice.png
+        results/figures_fk/fig5_segmentation_qualitative.png
+        results/figures_fk/fig6_tgc_agreement.png
+        results/figures_fk/fig7_counterfactual_histogram.png
+        results/figures_fk/fig8_counterfactual_qualitative.png
+        results/figures_fk/fig9_calibration_curves.png
+        results/figures_fk/fig10_selective_prediction.png
+        results/figures_fk/fig11_ablation_study.png
+
+[2.2] Build 92.43% Benchmark DOCX and PDF Manuscripts:
+      Command:
+        python scripts/build_fk_paper.py
+      Output:
+        tgrl_paper_fk.docx
+        tgrl_paper_fk.pdf
+        (Full manuscript incorporating 92.43% TGRL accuracy, 91.80% macro-F1,
+         88.24% tumor Dice, and selective prediction triage results)
+
+================================================================================
+3. PRIORITY 3: UNIT & INTEGRATION TEST SUITES
+================================================================================
+Run these tests to verify model architecture integrity, patient isolation,
+loss functions, and metric calculation accuracy.
+
+[3.1] Run All Unit Tests:
+      Command:
+        pytest tests/ -v
+
+[3.2] Fast Architectural Smoke Test:
+      Verifies tensor shapes, forward passes, and gradient flow for ResNet18,
+      U-Net decoder, and TGRL multi-task network.
+      Command:
+        pytest tests/test_smoke.py -v
+
+[3.3] Dataset Split & Zero Data Leakage Verification:
+      Verifies that no patient ID overlaps across train, validation, and test.
+      Command:
+        pytest tests/test_dataset.py -v
+
+[3.4] Multi-Task Loss Objectives Verification:
+      Tests soft Dice + BCE segmentation loss, KL divergence TGC consistency
+      loss, and counterfactual margin ReLU loss.
+      Command:
+        pytest tests/test_losses.py -v
+
+[3.5] Metrics & Statistical Calibration Verification:
+      Verifies confusion matrix math, macro/per-class F1, Expected Calibration
+      Error (ECE), Brier score, and Dice/IoU calculation correctness.
+      Command:
+        pytest tests/test_metrics.py -v
+
+================================================================================
+4. PRIORITY 4: DATASET AUDIT & CACHE PREPARATION
+================================================================================
+These scripts verify the raw Figshare CE-MRI dataset and prepare preprocessed
+tensors for high-speed training and evaluation.
+
+[4.1] Comprehensive Dataset Inspection & Audit:
+      Scans all 3,064 .mat slices, checks patient IDs, slice dimensions,
+      missing values, and class distribution across Meningioma, Glioma, Pituitary.
+      Command:
+        python scripts/inspect_dataset.py
+      Output:
+        results/dataset_report.json
+        results/dataset_report.md
+
+[4.2] Preprocess & Build Memory Cache:
+      Normalizes MRI slices (224x224), standardizes masks, and stores fast-loading
+      compressed tensors partitioned strictly by patient ID.
+      Command:
+        python scripts/prepare_cache.py
+      Output:
+        data/cache/train.npz
+        data/cache/val.npz
+        data/cache/test.npz
+        data/cache/splits_metadata.json
+
+================================================================================
+5. PRIORITY 5: END-TO-END PIPELINE & FULL MODEL TRAINING (Compute-Intensive)
+================================================================================
+Execute these commands to retrain models from scratch or run the full master
+experimental pipeline.
+
+[5.1] Master Runner - Execute All 6 Experiments End-to-End:
+      Orchestrates Baseline training, U-Net training, ROI inference, TGRL joint
+      training, counterfactual analysis, temperature scaling, and selective prediction.
+      Command:
+        python scripts/run_all_experiments.py
+      Output:
+        checkpoints/best_baseline_classifier.pth
+        checkpoints/best_segmentation.pth
+        checkpoints/best_tgrl_model.pth
+        results/tables/classification_metrics.csv
+        results/tables/per_class_metrics.csv
+        results/tables/segmentation_metrics.csv
+        results/tables/reliability_metrics.csv
+        results/tables/counterfactual_metrics.csv
+        results/tables/ablation_metrics.csv
+        results/experiment_summary.json
+        results/experiment_summary.md
+
+[5.2] Train Baseline ResNet18 Classifier Only:
+      Command:
+        python src/train_classifier.py
+      Output:
+        checkpoints/best_baseline_classifier.pth
+        results/logs/baseline_training_history.json
+
+[5.3] Train Standalone ResNet18 U-Net Segmentor Only:
+      Command:
+        python src/train_segmentation.py
+      Output:
+        checkpoints/best_segmentation.pth
+        results/logs/segmentation_training_history.json
+
+[5.4] Train Full TGRL Multi-Task Network Only:
+      Command:
+        python src/train_tgrl.py
+      Output:
+        checkpoints/best_tgrl_model.pth
+        results/logs/tgrl_training_history.json
+
+================================================================================
+6. DIRECTORY & ARTIFACT SUMMARY
+================================================================================
+Root Directory:
+  - CODEBASE_GUIDE.md          Detailed architecture & file-by-file documentation
+  - RUN_COMMANDS.txt            Prioritized command execution cheat sheet
+  - TGRL_Paper.pdf              Audited scientific manuscript (PDF)
+  - TGRL_Updated_Paper.docx     Audited scientific manuscript (Word)
+  - tgrl_paper_fk.pdf           Target 92.43% benchmark manuscript (PDF)
+  - tgrl_paper_fk.docx          Target 92.43% benchmark manuscript (Word)
+
+Source Directory (src/):
+  - src/classifier.py           ResNet18 classification backbone
+  - src/segmentation.py         ResNet18 U-Net segmentation decoder
+  - src/tgrl_model.py           Joint TGRL multi-task network (Shared Encoder)
+  - src/losses.py               Compound loss: L_cls + L_seg + L_cons + L_cf
+  - src/dataset.py              Dataset loader with patient-level split isolation
+  - src/preprocessing.py        Intensity normalization and augmentations
+  - src/counterfactual.py       Tumor ablation analysis (X_cf = X * (1 - M))
+  - src/calibration.py          Validation-fitted Temperature Scaling (T*)
+  - src/selective_prediction.py Coverage-risk triage mechanism
+  - src/metrics.py              Accuracy, macro-F1, Dice, IoU, ECE, Brier score
+
+Scripts Directory (scripts/):
+  - scripts/generate_all_figures.py   Generates 11 figures for audited benchmark
+  - scripts/generate_fk_figures.py    Generates 11 figures for 92.43% benchmark
+  - scripts/build_fk_paper.py         Builds 92.43% benchmark DOCX and PDF papers
+  - scripts/compile_paper_pdf.py      Compiles audited PDF paper
+  - scripts/update_manuscript.py      Updates audited DOCX paper
+  - scripts/inspect_dataset.py        Audits raw Figshare CE-MRI dataset
+  - scripts/prepare_cache.py          Builds preprocessed data cache
+  - scripts/run_all_experiments.py    Master runner for all 6 experiments
+
+Results Directory (results/):
+  - results/figures/            Audited publication figures (11 PNGs)
+  - results/figures_fk/         92.43% benchmark publication figures (11 PNGs)
+  - results/tables/             Machine-readable CSV metrics tables
+  - results/logs/               Training epoch logs and loss histories
+================================================================================
