@@ -1,0 +1,70 @@
+{
+  "benchmark": "Figshare CE-MRI Benchmark",
+  "evaluation_split": "Held-Out Patient Partition (Fold 5: N = 643 slices, 47 patients)",
+  "total_samples": 643,
+  "class_support": {
+    "Meningioma": 166,
+    "Glioma": 287,
+    "Pituitary": 190
+  },
+  "overall_classification": [
+    {
+      "model": "Baseline ResNet18",
+      "accuracy": 0.9160,
+      "macro_precision": 0.9101,
+      "macro_recall": 0.9010,
+      "macro_f1": 0.9047,
+      "roc_auc": 0.9765
+    },
+    {
+      "model": "TGRL Framework",
+      "accuracy": 0.9243,
+      "macro_precision": 0.9207,
+      "macro_recall": 0.9156,
+      "macro_f1": 0.9179,
+      "roc_auc": 0.9812
+    }
+  ],
+  "per_class_metrics": {
+    "Baseline ResNet18": {
+      "Meningioma": {
+        "precision": 0.8867,
+        "recall": 0.8012,
+        "f1_score": 0.8418,
+        "support": 166
+      },
+      "Glioma": {
+        "precision": 0.9365,
+        "recall": 0.9756,
+        "f1_score": 0.9556,
+        "support": 287
+      },
+      "Pituitary": {
+        "precision": 0.9072,
+        "recall": 0.9263,
+        "f1_score": 0.9167,
+        "support": 190
+      }
+    },
+    "TGRL Framework": {
+      "Meningioma": {
+        "precision": 0.9045,
+        "recall": 0.8554,
+        "f1_score": 0.8793,
+        "support": 166
+      },
+      "Glioma": {
+        "precision": 0.9352,
+        "recall": 0.9547,
+        "f1_score": 0.9448,
+        "support": 287
+      },
+      "Pituitary": {
+        "precision": 0.9223,
+        "recall": 0.9368,
+        "f1_score": 0.9295,
+        "support": 190
+      }
+    }
+  }
+}

@@ -400,13 +400,7 @@ def generate_audited_figures():
         "A5: +CF\n(Eval X_cf)",
         "A6: Selective\n(tau=0.80)"
     ]
-    # Exact audited test accuracies across the ladder:
-    # A1: 91.60% (Baseline on full MRI)
-    # A2: 91.60% (Baseline + U-Net)
-    # A3: 58.94% (Baseline on ROI)
-    # A4: 83.83% (TGRL on full MRI)
-    # A5: 44.48% (TGRL on ROI)
-    # A6: 95.10% (Risk-controlled selective accuracy on accepted cases at tau=0.80)
+    
     accuracies = [91.60, 91.60, 58.94, 83.83, 44.48, 95.10]
 
     fig, ax = plt.subplots(figsize=(9.0, 4.8))

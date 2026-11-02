@@ -8,6 +8,7 @@ checkpoints/
 *.pth
 *.pt
 *.npz
+!results/test_predictions.npz
 
 # Cached dataset arrays and raw data
 data/cache/

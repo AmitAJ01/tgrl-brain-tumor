@@ -21,6 +21,14 @@ TABLE OF CONTENTS:
 These scripts execute instantly (< 10 seconds) using the saved experimental
 metrics and evaluation data. No model retraining is required.
 
+[1.0] Display Overall & Classwise Accuracy in Terminal:
+      Command:
+        python show_results.py
+      Or:
+        python scripts/show_results.py
+      (Dynamically fetches and formats overall comparison and per-class precision/recall/F1)
+
+
 [1.1] Generate all 11 Audited Publication Figures:
       Command:
         python scripts/generate_all_figures.py
