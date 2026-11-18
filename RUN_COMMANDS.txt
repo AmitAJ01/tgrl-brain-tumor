@@ -24,8 +24,6 @@ metrics and evaluation data. No model retraining is required.
 [1.0] Display Overall & Classwise Accuracy in Terminal:
       Command:
         python show_results.py
-      Or:
-        python scripts/show_results.py
       (Dynamically fetches and formats overall comparison and per-class precision/recall/F1)
 
 
