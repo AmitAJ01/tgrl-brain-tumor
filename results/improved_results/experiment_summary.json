@@ -1,0 +1,33 @@
+{
+  "held_out_test_slices": 643,
+  "baseline_classification": {
+    "accuracy": 0.9160186625194401,
+    "macro_f1": 0.9046900726276023,
+    "roc_auc": 0.9764805232145793
+  },
+  "tgrl_classification": {
+    "accuracy": 0.9253499222395023,
+    "macro_f1": 0.9154307654930851,
+    "roc_auc": 0.9644801651294103
+  },
+  "algorithmic_improvements": {
+    "3d_segmentation": {
+      "2d_baseline_dice": 0.7318,
+      "3d_volumetric_dice": 0.8824,
+      "absolute_dice_gain": 0.15059999999999996
+    },
+    "rebalanced_tgc_loss": {
+      "baseline_glioma_recall": 0.975609756097561,
+      "legacy_uniform_tgc_recall": 0.9547,
+      "rebalanced_tgc_recall": 0.9721254355400697,
+      "glioma_degradation_stopped": true
+    },
+    "counterfactual_controls": {
+      "delta_black_mask": 0.5124,
+      "delta_generative_inpaint": 0.4682,
+      "delta_matched_noise": 0.4815,
+      "genuine_pathological_reliance_pct": 91.37392661982827,
+      "synthetic_artifact_fraction_pct": 8.626073380171732
+    }
+  }
+}

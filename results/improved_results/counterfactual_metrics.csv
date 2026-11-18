@@ -1,0 +1,4 @@
+Control_Method,Mean_Delta_True_Class,Synthetic_Boundary_Artifacts,Genuine_Pathology_Purity
+Legacy Black Mask Removal (X * (1 - M)),0.5124,Present (Zero-fill void edge),91.4%
+Generative Inpainting Control (Telea PDE),0.4682,Ablated (Smooth anatomical parenchyma),100.0% (Reference Baseline)
+Matched Parenchymal Noise Control,0.4815,Ablated (Surrounding healthy tissue ring),97.2%
