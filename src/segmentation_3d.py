@@ -61,10 +61,10 @@ class AnisotropicUNet3D(nn.Module):
         self.pool1 = nn.MaxPool3d(kernel_size=(1, 2, 2))  # Downsample in-plane first
 
         self.enc2 = ConvBlock3D(c, c * 2, kernel_size=(3, 3, 3), padding=(1, 1, 1))
-        self.pool2 = nn.MaxPool3d(kernel_size=(2, 2, 2))  # Downsample isotropic
+        self.pool2 = nn.MaxPool3d(kernel_size=(1, 2, 2))  # Keep depth intact for shallow slabs
 
         self.enc3 = ConvBlock3D(c * 2, c * 4, kernel_size=(3, 3, 3), padding=(1, 1, 1))
-        self.pool3 = nn.MaxPool3d(kernel_size=(2, 2, 2))
+        self.pool3 = nn.MaxPool3d(kernel_size=(1, 2, 2))
 
         # Bottleneck
         self.bottleneck = ConvBlock3D(c * 4, c * 8, kernel_size=(3, 3, 3), padding=(1, 1, 1))
@@ -159,9 +159,11 @@ class VolumetricContextUNet(nn.Module):
             gray = x.mean(dim=1, keepdim=True)  # [B, 1, H, W]
             vol = gray.unsqueeze(2).repeat(1, 1, self.num_depth, 1, 1)  # [B, 1, 3, H, W]
 
-            vol_feat = self.vol_encoder(vol)  # [B, 32, 3, H, W]
-            # Center-slice 3D context
-            ctx_2d = vol_feat[:, :, self.num_depth // 2, :, :]  # [B, 32, H, W]
+            # Multi-scale volumetric feature extraction (receptive field spans volumetric slab)
+            vol_down = F.interpolate(vol, scale_factor=(1, 0.25, 0.25), mode="trilinear", align_corners=False)  # [B, 1, 3, 56, 56]
+            vol_feat = self.vol_encoder(vol_down)  # [B, 32, 3, 56, 56]
+            ctx_low = vol_feat[:, :, self.num_depth // 2, :, :]  # [B, 32, 56, 56]
+            ctx_2d = F.interpolate(ctx_low, size=(h, w), mode="bilinear", align_corners=False)  # [B, 32, H, W]
 
             fused = torch.cat([x, ctx_2d], dim=1)  # [B, C + 32, H, W]
             e1 = self.in_conv(fused)
