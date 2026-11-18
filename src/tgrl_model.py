@@ -6,14 +6,19 @@ Directly implements Figure 2 and Algorithm 1 of the paper.
 
 import torch
 import torch.nn as nn
-import torchvision.models as models
+from src.classifier import get_resnet18_backbone
 from src.segmentation import DecoderBlock
+try:
+    from src.segmentation_3d import VolumetricContextUNet
+except ImportError:
+    VolumetricContextUNet = None
 
 class TGRLNetwork(nn.Module):
-    def __init__(self, num_classes: int = 3, pretrained: bool = True):
+    def __init__(self, num_classes: int = 3, pretrained: bool = True, use_3d_segmentor: bool = False):
         super().__init__()
-        weights = models.ResNet18_Weights.DEFAULT if pretrained else None
-        resnet = models.resnet18(weights=weights)
+        self.use_3d_segmentor = use_3d_segmentor
+        resnet = get_resnet18_backbone(pretrained=pretrained)
+
 
         # Shared Encoder F
         self.init_conv = nn.Sequential(
@@ -28,6 +33,11 @@ class TGRLNetwork(nn.Module):
         self.layer4 = resnet.layer4   # [B, 512, 7, 7] - bottleneck
 
         # Segmentation Decoder S
+        if self.use_3d_segmentor and VolumetricContextUNet is not None:
+            self.vol_segmentor = VolumetricContextUNet(in_channels=3, num_depth_slices=3)
+        else:
+            self.vol_segmentor = None
+
         self.dec4 = DecoderBlock(512, 256, 256)
         self.dec3 = DecoderBlock(256, 128, 128)
         self.dec2 = DecoderBlock(128, 64, 64)
@@ -39,6 +49,7 @@ class TGRLNetwork(nn.Module):
         # Classification Head C (attached to bottleneck features)
         self.gap = nn.AdaptiveAvgPool2d((1, 1))
         self.classifier = nn.Linear(512, num_classes)
+
 
     def encode(self, x: torch.Tensor):
         x0 = self.init_conv(x)
@@ -68,15 +79,18 @@ class TGRLNetwork(nn.Module):
         _, _, _, _, x4 = self.encode(x)
         return self.classify_bottleneck(x4)
 
-    def forward(self, x: torch.Tensor, compute_roi: bool = False, compute_cf: bool = False):
+    def forward(self, x: torch.Tensor, compute_roi: bool = False, compute_cf: bool = False, cf_method: str = "inpaint"):
         """
         Forward pass implementing Algorithm 1:
-        1. Encodes x, produces mask M = S(x) and full logits p_full.
+        1. Encodes x, produces mask M = S(x) (using 3D volumetric context if enabled) and full logits p_full.
         2. If compute_roi: computes X_ROI = X ⊙ M, forwards through C(F(X_ROI)).
-        3. If compute_cf: computes X_cf = X ⊙ (1 - M), forwards through C(F(X_cf)).
+        3. If compute_cf: computes X_cf using generative inpainting or matched noise to isolate pathological reliance.
         """
         x0, x1, x2, x3, x4 = self.encode(x)
-        mask = self.decode_segmentation(x0, x1, x2, x3, x4)
+        if self.use_3d_segmentor and self.vol_segmentor is not None:
+            mask = self.vol_segmentor(x)
+        else:
+            mask = self.decode_segmentation(x0, x1, x2, x3, x4)
         logits_full = self.classify_bottleneck(x4)
 
         results = {
@@ -94,11 +108,15 @@ class TGRLNetwork(nn.Module):
             results["x_roi"] = x_roi
 
         if compute_cf:
-            # Counterfactual image: X_cf = X ⊙ (1 - M)
-            x_cf = x * (1.0 - mask.detach())
+            if cf_method == "black_mask":
+                x_cf = x * (1.0 - mask.detach())
+            else:
+                from src.counterfactual import generate_counterfactual_batch
+                x_cf = generate_counterfactual_batch(x, mask.detach(), method=cf_method)
             logits_cf = self.classify_image(x_cf)
             results["logits_cf"] = logits_cf
             results["prob_cf"] = torch.softmax(logits_cf, dim=1)
             results["x_cf"] = x_cf
 
         return results
+

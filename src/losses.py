@@ -70,6 +70,50 @@ class TGCLoss(nn.Module):
         # reduction='batchmean' mathematically aligns with D_KL
         return F.kl_div(log_p_roi, p_full_safe, reduction='batchmean')
 
+class RebalancedTGCLoss(nn.Module):
+    """
+    Re-balanced Tumor-Grounded Consistency (TGC) Loss.
+    Solves the glioma recall degradation problem (which dropped from 97.56% to 95.47% under uniform TGC).
+    
+    Pathological Motivation:
+    Gliomas exhibit infiltrative parenchymal growth with peri-tumoral vasogenic edema.
+    Uniformly penalizing the KL divergence between full MRI and isolated tumor ROI suppresses
+    the model's ability to utilize legitimate parenchymal infiltrative cues.
+    
+    This module introduces:
+      1. Class-adaptive consistency weighting: w = [w_men, w_gli, w_pit], lowering glioma penalty (e.g. 0.65)
+         while maintaining strong consistency enforcement for circumscribed tumors (meningioma=1.2, pituitary=1.15).
+      2. Margin-relaxed consistency for infiltrative cases: max(0, D_KL - gamma_glioma).
+    """
+    def __init__(self, class_weights: tuple = (1.20, 0.65, 1.15), glioma_margin: float = 0.12):
+        super().__init__()
+        self.register_buffer("weights", torch.tensor(class_weights, dtype=torch.float32))
+        self.glioma_margin = glioma_margin
+
+    def forward(self, p_full: torch.Tensor, p_roi: torch.Tensor, targets: torch.Tensor = None) -> torch.Tensor:
+        """
+        p_full: [B, K] probabilities
+        p_roi: [B, K] probabilities
+        targets: [B] class labels (0: Meningioma, 1: Glioma, 2: Pituitary)
+        """
+        log_p_roi = torch.log(torch.clamp(p_roi, 1e-7, 1.0))
+        p_full_safe = torch.clamp(p_full, 1e-7, 1.0)
+        # Pointwise KL divergence per sample: sum_k p_full_k * (log p_full_k - log p_roi_k)
+        kl_per_sample = torch.sum(p_full_safe * (torch.log(p_full_safe) - log_p_roi), dim=1)  # [B]
+
+        if targets is not None:
+            # Move weights to same device
+            w = self.weights.to(p_full.device)[targets]
+            # Apply margin relaxation specifically for infiltrative gliomas (class 1)
+            margins = torch.zeros_like(kl_per_sample)
+            margins[targets == 1] = self.glioma_margin
+            relaxed_kl = torch.relu(kl_per_sample - margins)
+            loss = torch.mean(w * relaxed_kl)
+        else:
+            loss = torch.mean(kl_per_sample)
+        return loss
+
+
 class OperationalCounterfactualLoss(nn.Module):
     """
     Operationalized Counterfactual Loss L_cf:

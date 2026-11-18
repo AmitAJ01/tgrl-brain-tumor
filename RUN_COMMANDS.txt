@@ -101,7 +101,14 @@ loss functions, and metric calculation accuracy.
       Command:
         pytest tests/ -v
 
-[3.2] Fast Architectural Smoke Test:
+[3.2] Reviewer Improvements Verification Suite:
+      Verifies 3D volumetric U-Net segmentation, Re-balanced TGC consistency loss
+      preventing glioma degradation, and generative inpainting / matched noise counterfactuals.
+      Command:
+        pytest tests/test_improvements.py -v
+
+[3.3] Fast Architectural Smoke Test:
+
       Verifies tensor shapes, forward passes, and gradient flow for ResNet18,
       U-Net decoder, and TGRL multi-task network.
       Command:

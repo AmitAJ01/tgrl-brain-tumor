@@ -6,12 +6,19 @@ Preserves strict spatial alignment between MRI slice and tumor segmentation mask
 import numpy as np
 import cv2
 import torch
-import torchvision.transforms.functional as TF
 import random
+
+try:
+    import torchvision.transforms.functional as TF
+    HAS_TV = True
+except ImportError:
+    TF = None
+    HAS_TV = False
 
 # ImageNet standard normalization constants
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
+
 
 def normalize_intensity(img: np.ndarray) -> np.ndarray:
     """
@@ -51,15 +58,26 @@ class JointTransform:
         if self.is_train:
             # Random horizontal flip (p=0.5)
             if random.random() > 0.5:
-                img_tensor = TF.hflip(img_tensor)
-                mask_tensor = TF.hflip(mask_tensor)
+                if HAS_TV and TF is not None:
+                    img_tensor = TF.hflip(img_tensor)
+                    mask_tensor = TF.hflip(mask_tensor)
+                else:
+                    img_tensor = torch.flip(img_tensor, dims=[-1])
+                    mask_tensor = torch.flip(mask_tensor, dims=[-1])
 
             # Random gentle rotation (-15 to 15 degrees)
             if random.random() > 0.5:
                 angle = random.uniform(-15.0, 15.0)
-                img_tensor = TF.rotate(img_tensor, angle, interpolation=TF.InterpolationMode.BILINEAR)
-                mask_tensor = TF.rotate(mask_tensor, angle, interpolation=TF.InterpolationMode.NEAREST)
+                if HAS_TV and TF is not None:
+                    img_tensor = TF.rotate(img_tensor, angle, interpolation=TF.InterpolationMode.BILINEAR)
+                    mask_tensor = TF.rotate(mask_tensor, angle, interpolation=TF.InterpolationMode.NEAREST)
 
         # Apply ImageNet normalization to image
-        norm_img = TF.normalize(img_tensor, mean=IMAGENET_MEAN, std=IMAGENET_STD)
+        if HAS_TV and TF is not None:
+            norm_img = TF.normalize(img_tensor, mean=IMAGENET_MEAN, std=IMAGENET_STD)
+        else:
+            mean_t = torch.tensor(IMAGENET_MEAN, dtype=img_tensor.dtype, device=img_tensor.device).view(-1, 1, 1)
+            std_t = torch.tensor(IMAGENET_STD, dtype=img_tensor.dtype, device=img_tensor.device).view(-1, 1, 1)
+            norm_img = (img_tensor - mean_t) / std_t
         return norm_img, mask_tensor
+
